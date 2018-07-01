@@ -28,7 +28,7 @@ testvc.exe:
 	cl /MD /I$(incdir) test.c /link /nodefaultlib /out:$@ /libpath:./ perl524.lib
 
 
-test.dll:test.obj
+test.dll:test.obj testpl.obj
 	@echo
 	$(CC) -shared -dll -o$@ $^ $(LDFLAGS)
 
@@ -41,6 +41,9 @@ test.def: test.dll
 test.lib: test.def
 	lib /machine:$(M) /def:$^ /out:$@
 
+testpl.c: testpl.xs
+	xsubpp -prototypes -output $@ $^
+	
 main.exe: main.cpp test.lib
 	@echo 
 	@echo ==================== USING MS Visual Studio ====================

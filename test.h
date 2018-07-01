@@ -11,7 +11,7 @@
 extern "C" {
 #endif
 void DLLAPI *start_perl (int argc, char **argv, char **env);
-void DLLAPI test_perl();
+void DLLAPI test_perl(void (*pfn)(const char *));
 void DLLAPI shutdown_perl(void*perl);
 #ifdef __cplusplus
 }

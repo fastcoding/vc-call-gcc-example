@@ -1,6 +1,7 @@
 #include "test.h"
 #include <EXTERN.h>
 #include <perl.h> 
+#include "testpl.h"
 void *start_perl (int argc, char **argv, char **env)
 {
     PerlInterpreter *my_perl;
@@ -15,8 +16,11 @@ void *start_perl (int argc, char **argv, char **env)
     return my_perl;
 }
 
-void test_perl(){
+void test_perl(void (*pf)(const char *msg)){
     dTHX;
+    struct Funcs myfuncs;
+    myfuncs.pfn_mytest=pf;
+    setup_funcs(&myfuncs); 
     /** Treat $a as an integer **/
     eval_pv("$a = 3; $a **= 2", TRUE);
     printf("a = %d\n", SvIV(get_sv("a", 0)));
@@ -38,7 +42,14 @@ void test_perl(){
     }else{
 	printf("die testing has no error\n");
     }
+    boot_Test() ;
+    eval_pv("mytest('PERLMSG');",0);
+    if (SvTRUE(ERRSV)){
+	printf("detected error:%s\n",SvPV_nolen(ERRSV));
+    }else{
+    }
 }
+
 void shutdown_perl(void *perl){
     PerlInterpreter *my_perl=perl;
     perl_destruct(my_perl);
